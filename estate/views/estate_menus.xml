@@ -1,0 +1,18 @@
+<odoo>
+  <menuitem id="menu_estate" name="Real Estate"/>
+
+    <menuitem id="menu_estate_advertisement"
+              name="Advertisements"
+              parent="menu_estate"
+    />
+        <record id="action_estate_property" model="ir.actions.act_window">
+            <field name="name">Properties</field>
+            <field name="res_model">estate.property</field>
+            <field name="view_mode">tree,form,search</field>
+        </record>
+          <menuitem id="menu_estate_property"
+                        name="Properties"
+                        parent="menu_estate_advertisement"
+                        action="action_estate_property"
+          />
+</odoo>
