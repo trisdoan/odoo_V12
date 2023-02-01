@@ -1,1 +1,1 @@
-# real_estate_module
+# odoo 12
