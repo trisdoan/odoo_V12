@@ -57,12 +57,24 @@
                                     <field name="garden_orientation" string="Garden Orientation"/>
                                 </group>
                             </page>
+
+                            <page string="Offers">
+                                <field name="offer_ids" optional="show">
+                                    <tree>
+                                        <field name="price" string="Price"/>
+                                        <field name="partner_id" string="Partner"/>
+                                        <field name="status" string="Status"/>
+                                    </tree>
+                                </field>
+                            </page>
+
                             <page string="Other Info">
                                 <group>
                                     <field name="seller" string="Salesman"/>
                                     <field name="buyer" string="Buyer"/>
                                 </group>
                             </page>
+
                         </notebook>
                     </group>
                 </sheet>
@@ -107,6 +119,31 @@
         <field name="arch" type="xml">
             <form>
                 <field name="name" string="Title" />
+            </form>
+        </field>
+    </record>
+
+
+    <record id="view_tree_estate_property_offer" model="ir.ui.view">
+        <field name="name">Property Offer</field>
+        <field name="model">estate.estate_property_offer</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="price" string="Price" />
+                <field name="partner_id" string="Partner" />
+                <field name="status" string="Status" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_form_estate_property_offer" model="ir.ui.view">
+        <field name="name">Property Offer</field>
+        <field name="model">estate.estate_property_offer</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="price" string="Price" />
+                <field name="partner_id" string="Partner" />
+                <field name="status" string="Status" />
             </form>
         </field>
     </record>
