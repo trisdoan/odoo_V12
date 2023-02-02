@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, tools
+from odoo import models, fields, api
 from datetime import datetime, timedelta
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_compare
 
 
 class EstateProperty(models.Model):
@@ -95,6 +96,13 @@ class EstateProperty(models.Model):
         ('check_expected_price', 'check(expected_price > 0)', 'The expected price must be strictly positive'),
         ('check_selling_price', 'check(selling_price > 0)', 'The selling price must be strictly positive')
     ]
+
+    # Python constraints
+    @api.constrains("selling_price")
+    def check_selling_price(self):
+        for price in self:
+            if float_compare(self.selling_price, self.expected_price * 0.9, precision_digits=2) < 0:
+                raise ValidationError("Selling price must bigger")
 
 
 class PropertyType(models.Model):
