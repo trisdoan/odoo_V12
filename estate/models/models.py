@@ -8,6 +8,7 @@ from odoo.tools import float_compare
 
 class EstateProperty(models.Model):
     _name = 'estate.property'
+    _order = "id desc"
     name = fields.Char(required=True)
     description = fields.Text()
     postcode = fields.Char()
@@ -107,7 +108,12 @@ class EstateProperty(models.Model):
 
 class PropertyType(models.Model):
     _name = 'estate.estate_property_type'
+    _order = "name"
     name = fields.Char(required=True)
+    sequence = fields.Integer(string="Sequence")
+
+    # relation field
+    property_ids = fields.One2many("estate.property", "property_type_id")
 
     _sql_constraints = [
         ('unique_type_name', 'unique(name)', 'The type name must be unique')
@@ -116,7 +122,9 @@ class PropertyType(models.Model):
 
 class EstatePropertyTag(models.Model):
     _name = "estate.estate_property_tag"
+    _order = "name"
     name = fields.Char(required=True)
+    color = fields.Integer()
     _sql_constraints = [
         ('unique_tag_name', 'unique(name)', 'The tag name must be unique')
     ]
@@ -124,6 +132,7 @@ class EstatePropertyTag(models.Model):
 
 class EstatePropertyOffer(models.Model):
     _name = "estate.estate_property_offer"
+    _order = "price desc"
     price = fields.Float()
     status = fields.Selection(string='Status',
                               selection=[('accepted', 'Accepted'), ('refused', 'Refused')],
@@ -155,13 +164,14 @@ class EstatePropertyOffer(models.Model):
         for record in self:
             record.validity = (fields.Datetime.to_datetime(record.date_deadline) - record.create_date).days
 
-    @api.depends("property_id.buyer", "property_id.selling_price")
+    @api.depends("property_id.buyer", "property_id.selling_price", "property_id.state")
     def set_accept(self):
         self.ensure_one()
         for record in self:
             record.status = "accepted"
             record.property_id.buyer = record.partner_id
             record.property_id.selling_price = record.price
+            record.property_id.state = "offer accepted"
 
     def set_refuse(self):
         self.ensure_one()
