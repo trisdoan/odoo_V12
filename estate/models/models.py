@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from datetime import datetime, timedelta
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare
@@ -105,6 +105,12 @@ class EstateProperty(models.Model):
             if float_compare(self.selling_price, self.expected_price * 0.9, precision_digits=2) < 0:
                 raise ValidationError("Selling price must bigger")
 
+    @api.multi
+    def unlink(self):
+        if self.filtered(lambda record: record.state in ('sold', 'offer received', 'offer accepted')):
+            raise UserError("Only new and canceled properties can be deleted")
+        return super(EstateProperty, self).unlink()
+
 
 class PropertyType(models.Model):
     _name = 'estate.estate_property_type'
@@ -198,3 +204,11 @@ class EstatePropertyOffer(models.Model):
         self.ensure_one()
         for record in self:
             record.status = "refused"
+
+    @api.model
+    def create(self, vals):
+        estate_property = self.env['estate.property'].browse(vals['property_id'])
+        if float_compare(vals["price"], estate_property.best_price, precision_digits=2) <= 0:
+            raise UserError("Offer Price must be higher than %.2f" % estate_property.best_price)
+        estate_property.state = "offer received"
+        return super(EstatePropertyOffer, self).create(vals)
