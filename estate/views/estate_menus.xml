@@ -9,6 +9,7 @@
             <field name="name">Properties</field>
             <field name="res_model">estate.property</field>
             <field name="view_mode">tree,form,search</field>
+            <field name="context">{'search_default_state': 1}</field>
         </record>
           <menuitem id="menu_estate_property"
                         name="Properties"

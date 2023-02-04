@@ -112,12 +112,29 @@ class PropertyType(models.Model):
     name = fields.Char(required=True)
     sequence = fields.Integer(string="Sequence")
 
+    offer_count = fields.Integer(compute="_compute_offers")
+
     # relation field
     property_ids = fields.One2many("estate.property", "property_type_id")
+    offer_ids = fields.One2many("estate.property", "offer_ids")
 
     _sql_constraints = [
         ('unique_type_name', 'unique(name)', 'The type name must be unique')
     ]
+
+    def _compute_offers(self):
+        for record in self:
+            record.offer_count = self.env['estate.estate_property_offer'].search_count(
+                [('property_type_id', '=', record.id)])
+
+    def action_view_offers(self):
+        return {
+            'name': ('Offer'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'estate.estate_property_offer',
+            'view_mode': 'tree',
+            'domain': [('property_type_id', '=', self.id)]
+        }
 
 
 class EstatePropertyTag(models.Model):
@@ -143,10 +160,14 @@ class EstatePropertyOffer(models.Model):
     property_id = fields.Many2one("estate.property",
                                   # required=True,
                                   )
-    validity = fields.Integer(default=7)
+    validity = fields.Integer(default=7, string="Validity")
     date_deadline = fields.Date(compute="_compute_deadline",
-                                inverse="_inverse_date_deadline"
+                                inverse="_inverse_date_deadline",
+                                string="Date Deadline"
                                 )
+    # related field
+    property_type_id = fields.Many2one(related="property_id.property_type_id",
+                                       store=True)
     _sql_constraints = [
         ('check_offer_price', 'check(price > 0)', 'The offer price must be positive')
     ]
