@@ -212,3 +212,7 @@ class EstatePropertyOffer(models.Model):
             raise UserError("Offer Price must be higher than %.2f" % estate_property.best_price)
         estate_property.state = "offer received"
         return super(EstatePropertyOffer, self).create(vals)
+
+class EstateUsers(models.Model):
+    _inherit = "res.users"
+    property_ids = fields.One2many("estate.property", "seller", string="Properties")
