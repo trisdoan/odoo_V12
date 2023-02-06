@@ -87,10 +87,9 @@ class EstateProperty(models.Model):
     def set_sold(self):
         self.ensure_one()
         for record in self:
-            if not self.state == 'canceled':
-                self.state = 'sold'
-            else:
+            if self.state == 'canceled':
                 raise UserError("Cancel property cannot be sold")
+            self.state = 'sold'
         return True
 
     # SQL constraints
@@ -213,6 +212,7 @@ class EstatePropertyOffer(models.Model):
             raise UserError("Offer Price must be higher than %.2f" % estate_property.best_price)
         estate_property.state = "offer received"
         return super(EstatePropertyOffer, self).create(vals)
+
 
 class EstateUsers(models.Model):
     _inherit = "res.users"

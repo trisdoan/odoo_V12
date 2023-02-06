@@ -7,23 +7,10 @@ class Property(models.Model):
 
     # override sold action
     def set_sold(self):
-        # if self.env.user.has_group('account.group_account_invoice'):
-        #     # check if the user is in group billing
-        #     try:
-        #         self.check_access_rights('write')
-        #         self.check_access_rights('create')
-        #     except AccessError:
-        #         raise UserError(_("You don't have the access rights needed to update or create a invoice"))
-        #
-        #     # check access rules
-        #     self.check_access_rule('create')
-
-        journal = self.env['account.journal'].search([('type', '=', 'sale')])[0]
-
-        # create invoice line
+        res = super().set_sold()
         invoice_lines = [
             {
-                "name": self.name,
+                "name": self.buyer.id,
                 "quantity": 1,
                 "price_unit": (self.selling_price * 6) / 100
             },
@@ -33,14 +20,12 @@ class Property(models.Model):
                 "price_unit": 100
             }
         ]
+        if res:
+            journal = self.env['account.journal'].search([('type', '=', 'sale')])[0]
+            self.env['account.move'].sudo().create({
+                'partner_id': self.buyer.id,
+                'journal_id': journal.id,
+                'invoice_line_ids': self.env["account.invoice"].create(invoice_lines)
+            })
         print(" reached ".center(100, '='))
-        self.env['account.move'].sudo().create({
-            'partner_id': self.buyer.id,
-            'move_type': "out_invoice",
-            'journal_id': journal.id,
-            'invoice_line_ids': invoice_lines
-        })
-
-        return super().set_sold(self)
-        # else:
-        #     raise UserError(_("You don't have the access needed"))
+        return res
