@@ -35,7 +35,7 @@ class Property(models.Model):
                 }
             ]
             print(" reached ".center(100, '='))
-            account_move = self.env['account.move'].sudo().create({
+            self.env['account.move'].sudo().create({
                 'partner_id': self.buyer.id,
                 'move_type': "out_invoice",
                 'journal_id': journal.id,
