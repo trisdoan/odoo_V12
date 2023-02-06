@@ -86,10 +86,11 @@ class EstateProperty(models.Model):
 
     def set_sold(self):
         self.ensure_one()
-        if not self.state == 'canceled':
-            self.state = 'sold'
-        else:
-            raise UserError("Cancel property cannot be sold")
+        for record in self:
+            if not self.state == 'canceled':
+                self.state = 'sold'
+            else:
+                raise UserError("Cancel property cannot be sold")
         return True
 
     # SQL constraints
