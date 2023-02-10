@@ -123,6 +123,40 @@
         </field>
     </record>
 
+    <record id="kanban_view_estate" model="ir.ui.view">
+        <field name="name">Property Kanban</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="property_type_id" records_draggable="false">
+                <field name="tag_ids" widget="many2many_tags"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="font-weight-bold">
+                                <field name="name" class="font-weight-bold"/>
+                            </div>
+                            <p style="margin:0px; padding:0px">
+                                Expected Price:  <field name="expected_price"/>
+                            </p>
+                            <div t-if="record.selling_price.raw_value > '0'">
+                                <p style="margin:0px; padding:0px">
+                                    Selling Price: <field name="selling_price"/>
+                                </p>
+                            </div>
+                            <div t-if="record.best_price.raw_value > '0'">
+                                <p style="margin:0px; padding:0px">
+                                    Best offer: <field name="best_price"/>
+                                </p>
+                            </div>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+
+    </record>
+
     <record id="view_tree_estate_property_type" model="ir.ui.view">
         <field name="name">Property Types</field>
         <field name="model">estate.estate_property_type</field>
